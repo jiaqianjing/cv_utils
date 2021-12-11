@@ -59,7 +59,11 @@ def download_img(img_url, img_name=None, api_token='', output_dir='./gallery'):
     im_local_path = f'{output_dir}/{img_name}'
 
     header = {"Authorization": api_token}
-    r = requests.get(img_url, headers=header, stream=True)
+    try:
+        r = requests.get(img_url, headers=header, stream=True)
+    except Exception as e:
+        print(f"download pictures has error, {e}")
+        return
     if r.status_code == 200:
         open(im_local_path, 'wb').write(r.content)
     del r
