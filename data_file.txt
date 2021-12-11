@@ -1,0 +1,9 @@
+./gallery/apple_0.jpeg apple
+./gallery/apple_1.jpeg apple
+./gallery/banana_0.jpeg banana
+./gallery/banana_1.jpeg banana
+./gallery/banana_2.jpeg banana
+./gallery/orange_0.jpeg orange
+./gallery/orange_1.jpeg orange
+./gallery/orange_2.jpeg orange
+./gallery/orange_3.jpeg orange

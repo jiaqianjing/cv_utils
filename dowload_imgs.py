@@ -30,11 +30,11 @@ def download_img(img_url, img_name=None, api_token='', output_dir='./gallery'):
 
     assert img_url is not None, "please input your img_url"
 
-    if not img_name:
-        img_name = img_url.rsplit('/', 1)[-1]
-    else:
+    if img_name:
         suffix = img_url.rsplit('.', 1)[-1]
-        img_name = f'{img_name}.{suffix}'
+        img_name = f'{img_name}.{suffix}' 
+    else:
+        img_name = img_url.rsplit('/', 1)[-1]
 
     # create output dir
     Path(output_dir).mkdir(exist_ok=True)
@@ -44,6 +44,8 @@ def download_img(img_url, img_name=None, api_token='', output_dir='./gallery'):
     if r.status_code == 200:
         open(f'{output_dir}/{img_name}', 'wb').write(r.content)
     del r
+    img_tag, _ = img_name.rsplit('_', 1)
+    return f'{output_dir}/{img_name} {img_tag}'
 
 
 if __name__ == '__main__':
@@ -52,11 +54,22 @@ if __name__ == '__main__':
     temp = imgs_info.groupby('name').url.unique()
     print('current process {0}'.format(os.getpid()))
     p = multiprocessing.Pool(processes=args.num_proc)
-    for pid, img_urls in zip(temp.index, temp):
+    r = []
+    for name, img_urls in zip(temp.index, temp):
         for i, img_url in enumerate(img_urls):
-            new_pid = f'{pid}_{i}'
-            p.apply_async(download_img, args=(img_url, new_pid))
+            new_name = f'{name}_{i}'
+            r.append(p.apply_async(download_img, args=(img_url, new_name)))
     print('Waiting for all subprocesses done...')
     p.close()
     p.join()
     print('All processes done!')
+
+    # 获取每个进程的结果
+    res = []
+    for i in r:
+        res.append(i.get())
+    
+    # write downloaded data index
+    with open('./data_file.txt', 'w+') as f:
+        for line in res:
+            f.write(f'{line}\n')
