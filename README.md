@@ -1,2 +1,3 @@
-# multiprocess_download_img
-python 多进程下载图片
+# cv_utils
+1. 多进程下载图片
+2. 多进程筛选有效图片
