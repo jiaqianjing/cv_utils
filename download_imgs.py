@@ -74,7 +74,10 @@ def download_img(img_url, img_name=None, api_token='', output_dir='./gallery'):
         img_tag, _ = img_name.rsplit('_', 1)
         return f'{im_local_path} {img_tag}'
     else:
-        os.remove(im_local_path)
+        try:
+            os.remove(im_local_path)
+        except Exception as e:
+            print(f"delete {im_local_path} failed, {e}")
         return
 
 
