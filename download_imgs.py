@@ -43,8 +43,25 @@ def check_img_valid(img_path, ignore=True):
     else:
         return True
 
+def send_requests(url, api_token='', max_retries=3):
+    header = {"Authorization": api_token}
 
-def download_img(img_url, img_name=None, api_token='', output_dir='./gallery'):
+    i = 1
+    r = None
+    while i <= max_retries:
+        try:
+            r = requests.get(url, headers=header, stream=True, timeout=5)
+            return r
+        except Exception as e:
+            print(f"send requests {url} has error, {e}")
+            print(f"will try {max_retries}, current times: {i}")
+            i += 1
+
+def download_img(img_url,
+                 img_name=None,
+                 api_token='',
+                 output_dir='./gallery',
+                 max_retries=3):
 
     assert img_url is not None, "please input your img_url"
 
@@ -58,18 +75,17 @@ def download_img(img_url, img_name=None, api_token='', output_dir='./gallery'):
     Path(output_dir).mkdir(exist_ok=True)
     im_local_path = f'{output_dir}/{img_name}'
 
-    header = {"Authorization": api_token}
-    try:
-        r = requests.get(img_url, headers=header, stream=True)
-    except Exception as e:
-        print(f"download picture: {img_name} from {img_url} has error, {e}")
+    r = send_requests(img_url)
+
+    if r is None:
         return
+
     if r.status_code == 200:
         open(im_local_path, 'wb').write(r.content)
     del r
 
     # check imgage
-    ignore = not args.use_validator
+    ignore = True if not args.use_validator else False
     if check_img_valid(im_local_path, ignore=ignore):
         img_tag, _ = img_name.rsplit('_', 1)
         return f'{im_local_path} {img_tag}'
@@ -116,4 +132,3 @@ if __name__ == '__main__':
     end_time = time.perf_counter()
     spent_time = end_time - start_time
     print(f"total time spent: {spent_time}")
-    
