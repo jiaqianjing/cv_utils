@@ -91,6 +91,7 @@ def download_img(img_url,
         return f'{im_local_path} {img_tag}'
     else:
         try:
+            print(f"{im_local_path} has broken, will delete it.")
             os.remove(im_local_path)
         except Exception as e:
             print(f"delete {im_local_path} failed, {e}")
